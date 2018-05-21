@@ -1,19 +1,9 @@
-//import web3 from './web3latest';
-// import votingArtifacts from './contracts/Voting.json';
-// import contract from 'truffle-contract';
-
-// const voting = contract(votingArtifacts);
-// voting.setProvider(web3.currentProvider);
-
-// export default voting;
-
-import web3 from './web3latest';
 import votingArtifacts from './contracts/Voting.json';
 import contract from 'truffle-contract';
 
-export default function buildVoting() {
+export default function buildVoting(currentProvider) {
     const voting = contract(votingArtifacts);
-    voting.setProvider(web3.currentProvider);
+    voting.setProvider(currentProvider);
     return fixTruffleContractCompatibilityIssue(voting);
 }
 // Workaround for a compatibility issue between web3@1.0.0-beta.29 and truffle-contract@3.0.3

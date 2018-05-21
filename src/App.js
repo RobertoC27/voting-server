@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import voting_contract from './utils/voting_contract';
 import web3 from './utils/web3latest';
-
+import CandidateList from './components/CandidateList';
 
 
 class App extends Component {
@@ -9,7 +9,7 @@ class App extends Component {
     super(props);
     this.state = {voting_instance: {}, 
       candidates: [],
-      votes: [] }
+      account : '' }
   }
   
   async componentDidMount() {
@@ -21,7 +21,11 @@ class App extends Component {
 
     const votes = await this.getVotes(account, voting_instance, candidates);
 
-    this.setState({voting_instance, candidates, votes});
+    const candidateVotes = candidates.map((candidate, index) => {
+      return {name: candidate,
+              votes: votes[index]};
+    })
+    this.setState({voting_instance, candidates:candidateVotes, votes, account});
   }
 
   async getVotingAccount() {
@@ -47,16 +51,16 @@ class App extends Component {
 
   async getCandidateVotes(candidate, contract_instance, account) {
     const votes = await contract_instance.totalVotesFor.call(candidate, {from: account});
-    return votes;
+    return votes.toNumber();
   }
 
   render() {
     return (
       <div className="App">
-        <p>jeje salu2</p>
-        <p>{web3.version}</p>
-        <p>{this.state.votes}</p>
-        <p>{this.state.candidates}</p>
+        <CandidateList 
+          voting_instace={this.state.voting_instance}
+          account={this.state.account}
+          candidates={this.state.candidates}/>
       </div>
     );
   }

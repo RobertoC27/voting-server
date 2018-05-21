@@ -7,7 +7,7 @@ import CandidateList from './components/CandidateList';
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = {voting_instance: {}, 
+    this.state = {voting_instance: undefined, 
       candidates: [],
       account : '' }
   }
@@ -25,7 +25,7 @@ class App extends Component {
       return {name: candidate,
               votes: votes[index]};
     })
-    this.setState({voting_instance, candidates:candidateVotes, votes, account});
+    this.setState({voting_instance, candidates:candidateVotes, account});
   }
 
   async getVotingAccount() {
@@ -49,19 +49,57 @@ class App extends Component {
     return votes.map(vote => vote.toNumber());
   }
 
-  async getCandidateVotes(candidate, contract_instance, account) {
+  async getCandidateVotes(account, contract_instance, candidate) {
     const votes = await contract_instance.totalVotesFor.call(candidate, {from: account});
     return votes.toNumber();
   }
 
+  voteHandler = async (account, contract_instance, candidate) => {
+    await contract_instance.voteForCandidate(candidate, {from: account});
+    
+    const updatedVotes = await this.getCandidateVotes(account, contract_instance, candidate);
+    
+    const candidates = [...this.state.candidates];
+    
+    const updatedCandidates = candidates.map(cand => {
+      if (cand.name === candidate) {
+        cand.votes = updatedVotes;
+      }
+      return cand
+    });
+
+    this.setState({
+      ...this.state,
+      candidates: updatedCandidates
+    });
+  }
+
   render() {
-    return (
-      <div className="App">
-        <CandidateList 
-          voting_instace={this.state.voting_instance}
+    const style = {
+      width: "80%",
+      position: 'absolute',
+      letf: '50%',
+      top: '50%',
+      backgroundColor: '#eee'
+    };
+
+    let candidates = <div className="progress">
+      <div className="progress-bar bg-success progress-bar-striped progress-bar-animated"
+        role="progressbar"
+        aria-valuenow="80"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        style={style}>Conectando con el Blockchain</div>
+    </div>;
+    if(this.state.voting_instance !== undefined) {
+      candidates = <CandidateList 
+          voting_instance={this.state.voting_instance}
           account={this.state.account}
-          candidates={this.state.candidates}/>
-      </div>
+          candidates={this.state.candidates}
+          voteHandler={this.voteHandler}/>
+    }
+    return (
+      <div className="App">{candidates}</div>
     );
   }
 }

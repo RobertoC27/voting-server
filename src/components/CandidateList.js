@@ -22,8 +22,16 @@ const candidateList = (props) => {
         });
     }
 
+    let modal = null;
+    if(!props.allowVotes){
+        modal = <div> <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+        Launch demo modal
+      </button>
+      <div id='exampleModal'> JEJE salu2</div></div>
+      
+    }
     return (
-        <div> {candidates} </div>
+        <div> {modal}{candidates} </div>
     );
 }
 

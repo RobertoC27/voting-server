@@ -9,7 +9,9 @@ class App extends Component {
     super(props);
     this.state = {voting_instance: undefined, 
       candidates: [],
-      account : '' }
+      account : '',
+      allow_votes: true,
+      show_results: false}
   }
   
   async componentDidMount() {
@@ -70,36 +72,53 @@ class App extends Component {
 
     this.setState({
       ...this.state,
-      candidates: updatedCandidates
+      candidates: updatedCandidates,
+      allow_votes: false
+    });
+  }
+
+  modalHandler() {
+    const candidates = [...this.state.candidates];
+    this.setState({
+      ...this.state,
+      candidates,
+      allow_votes: true
     });
   }
 
   render() {
-    const style = {
+    const barStyle = {
       width: "80%",
-      position: 'absolute',
-      letf: '50%',
-      top: '50%',
-      backgroundColor: '#eee'
+      
     };
-
-    let candidates = <div className="progress">
+    const parentStyle = {
+      position: 'absolute',
+      width: '100%',
+      top: '50%'
+    }
+    let candidates = <div className="progress" style={parentStyle}>
       <div className="progress-bar bg-success progress-bar-striped progress-bar-animated"
         role="progressbar"
-        aria-valuenow="80"
+        aria-valuenow="60"
         aria-valuemin="0"
         aria-valuemax="100"
-        style={style}>Conectando con el Blockchain</div>
+        style={barStyle}>Conectando con el Blockchain</div>
     </div>;
+    
     if(this.state.voting_instance !== undefined) {
       candidates = <CandidateList 
           voting_instance={this.state.voting_instance}
           account={this.state.account}
           candidates={this.state.candidates}
-          voteHandler={this.voteHandler}/>
+          voteHandler={this.voteHandler}
+          allowVotes={this.state.allow_votes}
+          modalHandler={this.modalHandler}/>
     }
+
+    let resuls = null;
+    let progressBar = null;
     return (
-      <div className="App">{candidates}</div>
+      <div className="App">{progressBar}{candidates}{resuls}</div>
     );
   }
 }

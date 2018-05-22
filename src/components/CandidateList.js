@@ -4,12 +4,24 @@ import Candidate from './Candidate';
 
 const candidateList = (props) => {
 
-    const style ={width: "75%"};
-
-    let candidates = <div className="progress">
-    <div className="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style={style}>Obteniendo los candidatos</div>
-  </div>;
-
+    let candidates = null;
+    let loading = 
+        <div className="modal fade" id="exampleModalCenter" tabIndex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden={props.loading}>
+            <div className="modal-dialog modal-dialog-centered" role="document">
+                <div className="modal-content">
+                    <div className="modal-header">
+                        <h5 className="modal-title" id="exampleModalCenterTitle">Conectando con el Blockchain</h5>
+                        <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div className="modal-body">Emitiendo voto...</div>
+                    <div className="modal-footer">
+                        <button type="button" className="btn btn-success" data-dismiss="modal">Lo entiendo</button>
+                    </div>
+                </div>
+            </div>
+        </div>;
     if(props.voting_instance !== undefined) {
         candidates = props.candidates.map((candidate, index) => {
             return (
@@ -17,21 +29,15 @@ const candidateList = (props) => {
                     key={v4()}
                     name={candidate.name}
                     votes={candidate.votes}
-                    voteHandler={() => props.voteHandler(props.account, props.voting_instance, candidate.name)} />
+                    voteHandler={() => props.voteHandler(props.account, props.voting_instance, candidate.name)}
+                    allowVotes={props.allowVotes}
+                    loading={props.loading} />
             )
         });
     }
 
-    let modal = null;
-    if(!props.allowVotes){
-        modal = <div> <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-        Launch demo modal
-      </button>
-      <div id='exampleModal'> JEJE salu2</div></div>
-      
-    }
     return (
-        <div> {modal}{candidates} </div>
+        <div> {loading}{candidates} </div>
     );
 }
 

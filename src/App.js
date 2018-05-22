@@ -11,7 +11,8 @@ class App extends Component {
       candidates: [],
       account : '',
       allow_votes: true,
-      show_results: false}
+      show_results: false,
+      loading: false}
   }
   
   async componentDidMount() {
@@ -57,6 +58,8 @@ class App extends Component {
   }
 
   voteHandler = async (account, contract_instance, candidate) => {
+    this.setState({loading: true});
+
     await contract_instance.voteForCandidate(candidate, {from: account});
     
     const updatedVotes = await this.getCandidateVotes(account, contract_instance, candidate);
@@ -71,38 +74,33 @@ class App extends Component {
     });
 
     this.setState({
-      ...this.state,
       candidates: updatedCandidates,
-      allow_votes: false
-    });
-  }
-
-  modalHandler() {
-    const candidates = [...this.state.candidates];
-    this.setState({
-      ...this.state,
-      candidates,
-      allow_votes: true
+      allow_votes: false,
+      loading: false
     });
   }
 
   render() {
+    console.log(web3.eth.accounts.wallet)
     const barStyle = {
-      width: "80%",
+      width: "80%"
       
     };
+
     const parentStyle = {
       position: 'absolute',
       width: '100%',
-      top: '50%'
+      top: '50%',
+      height: '10%'
     }
+    
     let candidates = <div className="progress" style={parentStyle}>
-      <div className="progress-bar bg-success progress-bar-striped progress-bar-animated"
+      <div className="progress-bar bg-info progress-bar-striped progress-bar-animated"
         role="progressbar"
-        aria-valuenow="60"
+        aria-valuenow="80"
         aria-valuemin="0"
         aria-valuemax="100"
-        style={barStyle}>Conectando con el Blockchain</div>
+        style={barStyle}>Conectando con el Blockchain...</div>
     </div>;
     
     if(this.state.voting_instance !== undefined) {
@@ -112,13 +110,12 @@ class App extends Component {
           candidates={this.state.candidates}
           voteHandler={this.voteHandler}
           allowVotes={this.state.allow_votes}
-          modalHandler={this.modalHandler}/>
+          loading={this.state.loading}/>
     }
 
-    let resuls = null;
-    let progressBar = null;
+    let results = null;
     return (
-      <div className="App">{progressBar}{candidates}{resuls}</div>
+      <div className="App">{candidates}{results}</div>
     );
   }
 }
